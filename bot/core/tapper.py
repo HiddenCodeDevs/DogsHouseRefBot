@@ -1,5 +1,5 @@
 import asyncio
-import random
+import sys
 from urllib.parse import unquote, quote
 
 import aiohttp
@@ -120,6 +120,7 @@ class Tapper:
 
             if settings.REF_ID == '':
                 logger.critical('PLEASE ENTER REF ARGUMENT (AFTER STARTAPP?= TEXT)')
+                sys.exit()
             else:
                 start_param = settings.REF_ID
                 self.start_param = start_param
@@ -137,11 +138,9 @@ class Tapper:
                 string=unquote(
                     string=auth_url.split('tgWebAppData=', maxsplit=1)[1].split('&tgWebAppVersion', maxsplit=1)[0]))
 
-            self.user_id = (await self.tg_client.get_me()).id
-            if (await self.tg_client.get_me()).username:
-                self.username = (await self.tg_client.get_me()).username
-            else:
-                self.username = ''
+            me = await self.tg_client.get_me()
+            self.user_id = me.id
+            self.username = me.username if me.username else ''
 
             if with_tg is False:
                 await self.tg_client.disconnect()
@@ -165,9 +164,11 @@ class Tapper:
             response_json = await response.json()
             balance = response_json.get('balance')
             reference = response_json.get('reference')
+            streak = response_json.get('streak')
             return (True,
                     balance,
-                    reference)
+                    reference,
+                    streak)
         except Exception as error:
             logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Join request error - {error}")
 
@@ -194,26 +195,16 @@ class Tapper:
             logger.info(f"<light-yellow>{self.session_name}</light-yellow> | No tasks found or error occurred")
             return
 
+        tasks_not_completed = []
+
         for task in tasks:
             if not task['complete']:
                 slug = task['slug']
                 reward = task['reward']
-                if slug == 'good-dog':
-                    await self.verify_task('good-dog', http_client, reference, reward)
-                elif slug == 'send-bone-okx':
-                    await self.verify_task('send-bone-okx', http_client, reference, reward)
-                elif slug == 'send-bone-binance':
-                    await self.verify_task('send-bone-binance', http_client, reference, reward)
-                elif slug == 'send-bone-bybit':
-                    await self.verify_task('send-bone-bybit', http_client, reference, reward)
-                elif slug == 'invite-frens':
-                    await self.check_and_verify_invite_friends(http_client, reference, reward)
-                elif slug == 'subscribe-dogs':
-                    await self.subscribe_dogs_and_verify(http_client, reference, reward)
-                elif slug == 'follow-dogs-x':
-                    await self.verify_task('follow-dogs-x', http_client, reference, reward)
-                elif slug == 'add-bone-telegram':
-                    await self.add_bone_telegram_and_verify(http_client, reference, reward)
+                tasks_not_completed.append((slug, reward))
+
+        for slug, reward in tasks_not_completed:
+            await self.verify_task(slug, http_client, reference, reward)
 
     async def verify_task(self, task, http_client, reference, reward):
         try:
@@ -232,7 +223,7 @@ class Tapper:
             async with http_client.get(url) as response:
                 response_json = await response.json()
                 count = response_json.get('count', 0)
-                if count > 5:
+                if count >= 5:
                     await self.verify_task('invite-frens', http_client, reference, reward)
         except Exception as error:
             logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error checking friends count: {error}")
@@ -277,24 +268,32 @@ class Tapper:
         if proxy:
             await self.check_proxy(http_client=http_client, proxy=proxy)
 
-        tg_web_data = await self.get_tg_web_data(proxy=proxy)
-        tg_web_data_parts = tg_web_data.split('&')
-
-        user_data = tg_web_data_parts[0].split('=')[1]
-        chat_instance = tg_web_data_parts[1].split('=')[1]
-        chat_type = tg_web_data_parts[2].split('=')[1]
-        start_param = tg_web_data_parts[3].split('=')[1]
-        auth_date = tg_web_data_parts[4].split('=')[1]
-        hash_value = tg_web_data_parts[5].split('=')[1]
-
-        user_data_encoded = quote(user_data)
-
-        init_data = (f"user={user_data_encoded}&chat_instance={chat_instance}&chat_type={chat_type}&"
-                     f"start_param={start_param}&auth_date={auth_date}&hash={hash_value}")
+        streak_daily = 0
 
         while True:
             try:
-                status, balance, reference = await self.join_request(http_client=http_client, init_data=init_data)
+                tg_web_data = await self.get_tg_web_data(proxy=proxy)
+                tg_web_data_parts = tg_web_data.split('&')
+
+                user_data = tg_web_data_parts[0].split('=')[1]
+                chat_instance = tg_web_data_parts[1].split('=')[1]
+                chat_type = tg_web_data_parts[2].split('=')[1]
+                start_param = tg_web_data_parts[3].split('=')[1]
+                auth_date = tg_web_data_parts[4].split('=')[1]
+                hash_value = tg_web_data_parts[5].split('=')[1]
+
+                user_data_encoded = quote(user_data)
+
+                init_data = (f"user={user_data_encoded}&chat_instance={chat_instance}&chat_type={chat_type}&"
+                             f"start_param={start_param}&auth_date={auth_date}&hash={hash_value}")
+
+                status, balance, reference, streak = await self.join_request(http_client=http_client,
+                                                                             init_data=init_data)
+
+                if streak_daily != streak:
+                    streak_daily = streak
+                    logger.success(f"<light-yellow>{self.session_name}</light-yellow> | Successfully got streak, now "
+                                   f"{streak_daily}")
 
                 if status:
                     logger.info(f"<light-yellow>{self.session_name}</light-yellow> | Successfully referral, balance: "
@@ -305,9 +304,9 @@ class Tapper:
                     if tasks:
                         await self.complete_tasks(tasks, http_client=http_client, reference=reference)
 
-                logger.info(f"<light-yellow>{self.session_name}</light-yellow> | You can now close this bot")
+                logger.info(f"<light-yellow>{self.session_name}</light-yellow> | Going sleep 12h")
 
-                await asyncio.sleep(99999999)
+                await asyncio.sleep(12*3600)
 
             except InvalidSession as error:
                 raise error
