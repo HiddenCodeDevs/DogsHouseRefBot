@@ -268,7 +268,9 @@ class Tapper:
         if proxy:
             await self.check_proxy(http_client=http_client, proxy=proxy)
 
+        first_run = True
         streak_daily = 0
+        referred = False
 
         while True:
             try:
@@ -292,12 +294,17 @@ class Tapper:
 
                 if streak_daily != streak:
                     streak_daily = streak
-                    logger.success(f"<light-yellow>{self.session_name}</light-yellow> | Successfully got streak, now "
-                                   f"{streak_daily}")
+                    if first_run:
+                        logger.success(f"<light-yellow>{self.session_name}</light-yellow> | Successfully remembered "
+                                       f"streak and maybe get it (first run)")
+                    else:
+                        logger.success(f"<light-yellow>{self.session_name}</light-yellow> | Successfully got new streak"
+                                       f", now {streak_daily}")
 
-                if status:
+                if status and not referred:
                     logger.info(f"<light-yellow>{self.session_name}</light-yellow> | Successfully referral, balance: "
                                 f"{balance}")
+                    referred = True
 
                 if settings.AUTO_TASKS:
                     tasks = await self.get_tasks(http_client=http_client, reference=reference)
