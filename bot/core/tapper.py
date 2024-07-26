@@ -197,6 +197,19 @@ class Tapper:
             logger.info(f"<light-yellow>{self.session_name}</light-yellow> | No tasks found or error occurred")
             return
 
+        methods = {
+            'good-dog': self.verify_task,
+            'send-bone-okx': self.verify_task,
+            'send-bone-binance': self.verify_task,
+            'send-bone-bybit': self.verify_task,
+            'follow-dogs-x': self.verify_task,
+            'subscribe-dogs': self.subscribe_channel_and_verify,
+            'subscribe-blum': self.subscribe_channel_and_verify,
+            'subscribe-notcoin': self.subscribe_channel_and_verify,
+            'invite-frens': self.check_and_verify_invite_friends,
+            'add-bone-telegram': self.add_bone_telegram_and_verify,
+        }
+
         tasks_not_completed = []
 
         for task in tasks:
@@ -206,7 +219,8 @@ class Tapper:
                 tasks_not_completed.append((slug, reward))
 
         for slug, reward in tasks_not_completed:
-            await self.verify_task(slug, http_client, reference, reward)
+            if slug in methods:
+                await methods[slug](slug, http_client, reference, reward)
 
     async def verify_task(self, task, http_client, reference, reward):
         try:
@@ -219,31 +233,37 @@ class Tapper:
         except Exception as error:
             logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error verifying task {task}: {error}")
 
-    async def check_and_verify_invite_friends(self, http_client, reference, reward):
+    async def check_and_verify_invite_friends(self, slug, http_client, reference, reward):
         try:
             url = f'{self.url}/frens?user_id={self.user_id}&reference={reference}'
             async with http_client.get(url) as response:
                 response_json = await response.json()
                 count = response_json.get('count', 0)
                 if count >= 5:
-                    await self.verify_task('invite-frens', http_client, reference, reward)
+                    await self.verify_task(slug, http_client, reference, reward)
         except Exception as error:
             logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error checking friends count: {error}")
 
-    async def subscribe_dogs_and_verify(self, http_client, reference, reward):
+    async def subscribe_channel_and_verify(self, slug, http_client, reference, reward):
         try:
             if not self.tg_client.is_connected:
                 await self.tg_client.connect()
 
-            await self.tg_client.join_chat('dogs_community')
-            await self.verify_task('subscribe-dogs', http_client, reference, reward)
+            if slug == 'subscribe-dogs':
+                await self.tg_client.join_chat('dogs_community')
+            elif slug == 'subscribe-blum':
+                await self.tg_client.join_chat('blumcrypto')
+            elif slug == 'subscribe-notcoin':
+                await self.tg_client.join_chat('notcoin')
+
+            await self.verify_task(slug, http_client, reference, reward)
         except Exception as error:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error subscribing to @dogs_community: {error}")
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error subscribing to channel in task '{slug}': {error}")
         finally:
             if self.tg_client.is_connected:
                 await self.tg_client.disconnect()
 
-    async def add_bone_telegram_and_verify(self, http_client, reference, reward):
+    async def add_bone_telegram_and_verify(self, slug, http_client, reference, reward):
         try:
             if not self.tg_client.is_connected:
                 await self.tg_client.connect()
@@ -253,7 +273,7 @@ class Tapper:
 
             await self.tg_client.update_profile(first_name=f"{first_name} 🦴")
             await asyncio.sleep(5)
-            await self.verify_task('add-bone-telegram', http_client, reference, reward)
+            await self.verify_task(slug, http_client, reference, reward)
             await asyncio.sleep(3)
             await self.tg_client.update_profile(first_name=first_name)
         except Exception as error:
