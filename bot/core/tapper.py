@@ -26,6 +26,7 @@ class Tapper:
         self.user_id = 0
         self.username = None
         self.start_param = None
+        self.url = 'https://api.onetime.dog'
 
         self.session_ug_dict = self.load_user_agents() or []
 
@@ -163,8 +164,10 @@ class Tapper:
                         None)
             response_json = await response.json()
             balance = response_json.get('balance')
+            reference = response_json.get('reference')
             return (True,
-                    balance)
+                    balance,
+                    reference)
         except Exception as error:
             logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Join request error - {error}")
 
@@ -175,6 +178,96 @@ class Tapper:
             logger.info(f"{self.session_name} | Proxy IP: {ip}")
         except Exception as error:
             logger.error(f"{self.session_name} | Proxy: {proxy} | Error: {error}")
+
+    async def get_tasks(self, http_client, reference):
+        try:
+            response = await http_client.get(url=f'{self.url}/tasks?user_id={self.user_id}&reference={reference}')
+
+            response_json = await response.json()
+            return response_json
+        except Exception as error:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Get tasks request error - {error}")
+            return None
+
+    async def complete_tasks(self, tasks, http_client, reference):
+        if not tasks:
+            logger.info(f"<light-yellow>{self.session_name}</light-yellow> | No tasks found or error occurred")
+            return
+
+        for task in tasks:
+            if not task['complete']:
+                slug = task['slug']
+                reward = task['reward']
+                if slug == 'good-dog':
+                    await self.verify_task('good-dog', http_client, reference, reward)
+                elif slug == 'send-bone-okx':
+                    await self.verify_task('send-bone-okx', http_client, reference, reward)
+                elif slug == 'send-bone-binance':
+                    await self.verify_task('send-bone-binance', http_client, reference, reward)
+                elif slug == 'send-bone-bybit':
+                    await self.verify_task('send-bone-bybit', http_client, reference, reward)
+                elif slug == 'invite-frens':
+                    await self.check_and_verify_invite_friends(http_client, reference, reward)
+                elif slug == 'subscribe-dogs':
+                    await self.subscribe_dogs_and_verify(http_client, reference, reward)
+                elif slug == 'follow-dogs-x':
+                    await self.verify_task('follow-dogs-x', http_client, reference, reward)
+                elif slug == 'add-bone-telegram':
+                    await self.add_bone_telegram_and_verify(http_client, reference, reward)
+
+    async def verify_task(self, task, http_client, reference, reward):
+        try:
+            url = f'{self.url}/tasks/verify?task={task}&user_id={self.user_id}&reference={reference}'
+            async with http_client.post(url) as response:
+                if response.status == 200:
+                    logger.info(f"<light-yellow>{self.session_name}</light-yellow> | Task '{task}' completed successfully. Reward: {reward}")
+                else:
+                    logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Failed to verify task {task}, status code: {response.status}")
+        except Exception as error:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error verifying task {task}: {error}")
+
+    async def check_and_verify_invite_friends(self, http_client, reference, reward):
+        try:
+            url = f'{self.url}/frens?user_id={self.user_id}&reference={reference}'
+            async with http_client.get(url) as response:
+                response_json = await response.json()
+                count = response_json.get('count', 0)
+                if count > 5:
+                    await self.verify_task('invite-frens', http_client, reference, reward)
+        except Exception as error:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error checking friends count: {error}")
+
+    async def subscribe_dogs_and_verify(self, http_client, reference, reward):
+        try:
+            if not self.tg_client.is_connected:
+                await self.tg_client.connect()
+
+            await self.tg_client.join_chat('dogs_community')
+            await self.verify_task('subscribe-dogs', http_client, reference, reward)
+        except Exception as error:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error subscribing to @dogs_community: {error}")
+        finally:
+            if self.tg_client.is_connected:
+                await self.tg_client.disconnect()
+
+    async def add_bone_telegram_and_verify(self, http_client, reference, reward):
+        try:
+            if not self.tg_client.is_connected:
+                await self.tg_client.connect()
+
+            me = await self.tg_client.get_me()
+            first_name = me.first_name
+
+            await self.tg_client.update_profile(first_name=f"{first_name} 🦴")
+            await asyncio.sleep(5)
+            await self.verify_task('add-bone-telegram', http_client, reference, reward)
+            await asyncio.sleep(3)
+            await self.tg_client.update_profile(first_name=first_name)
+        except Exception as error:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error updating profile and verifying task: {error}")
+        finally:
+            if self.tg_client.is_connected:
+                await self.tg_client.disconnect()
 
     async def run(self, proxy: str | None) -> None:
         proxy_conn = ProxyConnector().from_url(proxy) if proxy else None
@@ -201,11 +294,16 @@ class Tapper:
 
         while True:
             try:
-                status, balance = await self.join_request(http_client=http_client, init_data=init_data)
+                status, balance, reference = await self.join_request(http_client=http_client, init_data=init_data)
 
                 if status:
                     logger.info(f"<light-yellow>{self.session_name}</light-yellow> | Successfully referral, balance: "
                                 f"{balance}")
+
+                if settings.AUTO_TASKS:
+                    tasks = await self.get_tasks(http_client=http_client, reference=reference)
+                    if tasks:
+                        await self.complete_tasks(tasks, http_client=http_client, reference=reference)
 
                 logger.info(f"<light-yellow>{self.session_name}</light-yellow> | You can now close this bot")
 

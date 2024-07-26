@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     API_ID: int
     API_HASH: str
    
+    AUTO_TASKS: bool = True
+
     REF_ID: str = ''
 
     USE_PROXY_FROM_FILE: bool = False
