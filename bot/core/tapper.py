@@ -1,5 +1,8 @@
 import asyncio
+import string
 import sys
+import random
+
 import aiohttp
 import json
 
@@ -8,6 +11,7 @@ from aiohttp_proxy import ProxyConnector
 from better_proxy import Proxy
 from urllib.parse import unquote, quote
 
+from faker import Faker
 from pyrogram import Client
 from pyrogram.errors import Unauthorized, UserDeactivated, AuthKeyUnregistered, FloodWait
 from pyrogram.raw.functions.messages import RequestAppWebView
@@ -143,6 +147,21 @@ class Tapper:
             me = await self.tg_client.get_me()
             self.user_id = me.id
             self.username = me.username if me.username else ''
+            if self.username == '':
+                while True:
+                    fake = Faker('en_US')
+
+                    name_english = fake.name()
+                    name_modified = name_english.replace(" ", "").lower()
+
+                    random_letters = ''.join(random.choices(string.ascii_lowercase, k=random.randint(1, 7)))
+                    final_name = name_modified + random_letters
+                    status = await self.tg_client.set_username(final_name)
+                    if status:
+                        logger.info(f"{self.session_name} | Set username {final_name}")
+                        break
+                    else:
+                        continue
 
             if with_tg is False:
                 await self.tg_client.disconnect()
