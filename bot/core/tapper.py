@@ -392,7 +392,6 @@ class Tapper:
                     referred = True
 
                 if settings.AUTO_TASKS:
-                    print(reference)
                     tasks = await self.get_tasks(http_client=http_client, proxy=proxy, reference=reference)
                     if tasks:
                         await self.complete_tasks(tasks, http_client=http_client, proxy=proxy, reference=reference)
