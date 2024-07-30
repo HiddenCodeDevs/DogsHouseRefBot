@@ -306,14 +306,20 @@ class Tapper:
             if not self.tg_client.is_connected:
                 await self.tg_client.connect()
 
+            channel = None
             if slug == 'subscribe-dogs':
-                await self.tg_client.join_chat('dogs_community')
+                channel = 'dogs_community'
             elif slug == 'subscribe-blum':
-                await self.tg_client.join_chat('blumcrypto')
+                channel = 'blumcrypto'
             elif slug == 'subscribe-notcoin':
-                await self.tg_client.join_chat('notcoin')
+                channel = 'notcoin'
 
-            await self.verify_task(slug, http_client, reference, reward)
+            if channel:
+                await self.tg_client.join_chat(channel)
+                await self.verify_task(slug, http_client, reference, reward)
+                
+                await asyncio.sleep(5)
+                await self.tg_client.leave_chat(channel)
         except Exception as error:
             logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error subscribing to channel in task '{slug}': {error}")
         finally:
