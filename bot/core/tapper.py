@@ -225,9 +225,9 @@ class Tapper:
             return new_reference
         return reference
 
-    async def get_tasks(self, http_client, reference, proxy):
+    async def get_tasks(self, http_client, reference):
         try:
-            reference = await self.get_reference(http_client, proxy, reference)
+            reference = await self.get_reference(http_client, reference)
             if reference is None:
                 return None
 
@@ -239,12 +239,12 @@ class Tapper:
             logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Get tasks request error - {error}")
             return None
 
-    async def complete_tasks(self, tasks, http_client, reference, proxy):
+    async def complete_tasks(self, tasks, http_client, reference):
         if not tasks:
             logger.info(f"<light-yellow>{self.session_name}</light-yellow> | No tasks found or error occurred")
             return
 
-        reference = await self.get_reference(http_client, proxy, reference)
+        reference = await self.get_reference(http_client, reference)
         if reference is None:
             return
 
@@ -383,9 +383,9 @@ class Tapper:
                     referred = True
 
                 if settings.AUTO_TASKS:
-                    tasks = await self.get_tasks(http_client=http_client, reference=reference, proxy=proxy)
+                    tasks = await self.get_tasks(http_client=http_client, reference=reference)
                     if tasks:
-                        await self.complete_tasks(tasks, http_client=http_client, reference=reference, proxy=proxy)
+                        await self.complete_tasks(tasks, http_client=http_client, reference=reference)
 
                 logger.info(f"<light-yellow>{self.session_name}</light-yellow> | Going sleep 12h")
 
