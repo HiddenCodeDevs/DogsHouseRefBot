@@ -205,6 +205,9 @@ class Tapper:
 
     async def get_reference(self, http_client, proxy, reference):
         if reference is None:
+
+            asyncio.sleep(5)
+
             tg_web_data = await self.get_tg_web_data(proxy=proxy, http_client=http_client)
             tg_web_data_parts = tg_web_data.split('&')
 
@@ -219,11 +222,12 @@ class Tapper:
 
             init_data = (f"user={user_data_encoded}&chat_instance={chat_instance}&chat_type={chat_type}&"
                          f"start_param={start_param}&auth_date={auth_date}&hash={hash_value}")
-            
+
             status, balance, new_reference, streak = await self.join_request(http_client=http_client,
-                                                                            init_data=init_data)
+                                                                             init_data=init_data)
             if not status:
-                logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Failed to obtain reference from join_request.")
+                logger.error(
+                    f"<light-yellow>{self.session_name}</light-yellow> | Failed to obtain reference from join_request.")
                 return None
             return new_reference
         return reference
@@ -284,9 +288,11 @@ class Tapper:
             url = f'{self.url}/tasks/verify?task={task}&user_id={self.user_id}&reference={reference}'
             async with http_client.post(url) as response:
                 if response.status == 200:
-                    logger.info(f"<light-yellow>{self.session_name}</light-yellow> | Task '{task}' completed successfully. Reward: {reward}")
+                    logger.info(
+                        f"<light-yellow>{self.session_name}</light-yellow> | Task '{task}' completed successfully. Reward: {reward}")
                 else:
-                    logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Failed to verify task {task}, status code: {response.status}")
+                    logger.error(
+                        f"<light-yellow>{self.session_name}</light-yellow> | Failed to verify task {task}, status code: {response.status}")
         except Exception as error:
             logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error verifying task {task}: {error}")
 
@@ -317,11 +323,12 @@ class Tapper:
             if channel:
                 await self.tg_client.join_chat(channel)
                 await self.verify_task(slug, http_client, reference, reward)
-                
+
                 await asyncio.sleep(5)
                 await self.tg_client.leave_chat(channel)
         except Exception as error:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error subscribing to channel in task '{slug}': {error}")
+            logger.error(
+                f"<light-yellow>{self.session_name}</light-yellow> | Error subscribing to channel in task '{slug}': {error}")
         finally:
             if self.tg_client.is_connected:
                 await self.tg_client.disconnect()
@@ -340,7 +347,8 @@ class Tapper:
             await asyncio.sleep(3)
             await self.tg_client.update_profile(first_name=first_name)
         except Exception as error:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error updating profile and verifying task: {error}")
+            logger.error(
+                f"<light-yellow>{self.session_name}</light-yellow> | Error updating profile and verifying task: {error}")
         finally:
             if self.tg_client.is_connected:
                 await self.tg_client.disconnect()
@@ -398,7 +406,7 @@ class Tapper:
 
                 logger.info(f"<light-yellow>{self.session_name}</light-yellow> | Going sleep 12h")
 
-                await asyncio.sleep(12*3600)
+                await asyncio.sleep(12 * 3600)
 
             except InvalidSession as error:
                 raise error
@@ -406,6 +414,7 @@ class Tapper:
             except Exception as error:
                 logger.error(f"{self.session_name} | Unknown error: {error}")
                 await asyncio.sleep(delay=3)
+
 
 async def run_tapper(tg_client: Client, proxy: str | None):
     try:
