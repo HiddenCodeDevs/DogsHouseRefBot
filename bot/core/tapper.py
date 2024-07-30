@@ -180,8 +180,7 @@ class Tapper:
             response = await http_client.post(url=f'https://api.onetime.dog/join?invite_hash={self.start_param}',
                                               data=init_data)
             if response.status not in (200, 201):
-                return (False,
-                        None)
+                return (False, None, None, None)
             response_json = await response.json()
             balance = response_json.get('balance')
             reference = response_json.get('reference')
@@ -201,19 +200,52 @@ class Tapper:
         except Exception as error:
             logger.error(f"{self.session_name} | Proxy: {proxy} | Error: {error}")
 
-    async def get_tasks(self, http_client, reference):
-        try:
-            response = await http_client.get(url=f'{self.url}/tasks?user_id={self.user_id}&reference={reference}')
+    async def get_reference(self, http_client, proxy, reference):
+        if reference is None:
+            tg_web_data = await self.get_tg_web_data(proxy=proxy)
+            tg_web_data_parts = tg_web_data.split('&')
 
+            user_data = tg_web_data_parts[0].split('=')[1]
+            chat_instance = tg_web_data_parts[1].split('=')[1]
+            chat_type = tg_web_data_parts[2].split('=')[1]
+            start_param = tg_web_data_parts[3].split('=')[1]
+            auth_date = tg_web_data_parts[4].split('=')[1]
+            hash_value = tg_web_data_parts[5].split('=')[1]
+
+            user_data_encoded = quote(user_data)
+
+            init_data = (f"user={user_data_encoded}&chat_instance={chat_instance}&chat_type={chat_type}&"
+                         f"start_param={start_param}&auth_date={auth_date}&hash={hash_value}")
+            
+            status, balance, new_reference, streak = await self.join_request(http_client=http_client,
+                                                                            init_data=init_data)
+            if not status:
+                logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Failed to obtain reference from join_request.")
+                return None
+            return new_reference
+        return reference
+
+    async def get_tasks(self, http_client, reference, proxy):
+        try:
+            reference = await self.get_reference(http_client, proxy, reference)
+            if reference is None:
+                return None
+
+            response = await http_client.get(url=f'{self.url}/tasks?user_id={self.user_id}&reference={reference}')
             response_json = await response.json()
             return response_json
+
         except Exception as error:
             logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Get tasks request error - {error}")
             return None
 
-    async def complete_tasks(self, tasks, http_client, reference):
+    async def complete_tasks(self, tasks, http_client, reference, proxy):
         if not tasks:
             logger.info(f"<light-yellow>{self.session_name}</light-yellow> | No tasks found or error occurred")
+            return
+
+        reference = await self.get_reference(http_client, proxy, reference)
+        if reference is None:
             return
 
         methods = {
@@ -222,6 +254,9 @@ class Tapper:
             'send-bone-binance': self.verify_task,
             'send-bone-bybit': self.verify_task,
             'follow-dogs-x': self.verify_task,
+            'notcoin-other-tiers': self.verify_task,
+            'join-blum-tribe': self.verify_task,
+            'subscribe-durov': self.verify_task,
             'subscribe-dogs': self.subscribe_channel_and_verify,
             'subscribe-blum': self.subscribe_channel_and_verify,
             'subscribe-notcoin': self.subscribe_channel_and_verify,
@@ -348,9 +383,9 @@ class Tapper:
                     referred = True
 
                 if settings.AUTO_TASKS:
-                    tasks = await self.get_tasks(http_client=http_client, reference=reference)
+                    tasks = await self.get_tasks(http_client=http_client, reference=reference, proxy=proxy)
                     if tasks:
-                        await self.complete_tasks(tasks, http_client=http_client, reference=reference)
+                        await self.complete_tasks(tasks, http_client=http_client, reference=reference, proxy=proxy)
 
                 logger.info(f"<light-yellow>{self.session_name}</light-yellow> | Going sleep 12h")
 
@@ -362,7 +397,6 @@ class Tapper:
             except Exception as error:
                 logger.error(f"{self.session_name} | Unknown error: {error}")
                 await asyncio.sleep(delay=3)
-
 
 async def run_tapper(tg_client: Client, proxy: str | None):
     try:
