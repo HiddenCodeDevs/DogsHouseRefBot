@@ -85,7 +85,7 @@ class Tapper:
 
         return load
 
-    async def get_tg_web_data(self, proxy: str | None) -> str:
+    async def get_tg_web_data(self, proxy: str | None, http_client: aiohttp.ClientSession) -> str:
         if proxy:
             proxy = Proxy.from_str(proxy)
             proxy_dict = dict(
@@ -125,7 +125,10 @@ class Tapper:
             InputBotApp = types.InputBotAppShortName(bot_id=peer, short_name="join")
 
             if settings.REF_ID == '':
-                logger.critical('PLEASE ENTER REF ARGUMENT (AFTER STARTAPP?= TEXT)')
+                logger.critical('PLEASE ENTER REF ARGUMENT (AFTER STARTAPP?= TEXT) ((YOU CAN PUT UR REFERRAL, '
+                                'OTHERWISE BOT WONT WORK))')
+                await http_client.close()
+                await self.tg_client.disconnect()
                 sys.exit()
             else:
                 start_param = settings.REF_ID
@@ -180,7 +183,7 @@ class Tapper:
             response = await http_client.post(url=f'https://api.onetime.dog/join?invite_hash={self.start_param}',
                                               data=init_data)
             if response.status not in (200, 201):
-                return (False, None, None, None)
+                return False, None, None, None
             response_json = await response.json()
             balance = response_json.get('balance')
             reference = response_json.get('reference')
@@ -202,7 +205,7 @@ class Tapper:
 
     async def get_reference(self, http_client, proxy, reference):
         if reference is None:
-            tg_web_data = await self.get_tg_web_data(proxy=proxy)
+            tg_web_data = await self.get_tg_web_data(proxy=proxy, http_client=http_client)
             tg_web_data_parts = tg_web_data.split('&')
 
             user_data = tg_web_data_parts[0].split('=')[1]
@@ -225,9 +228,9 @@ class Tapper:
             return new_reference
         return reference
 
-    async def get_tasks(self, http_client, reference):
+    async def get_tasks(self, http_client, proxy, reference):
         try:
-            reference = await self.get_reference(http_client, reference)
+            reference = await self.get_reference(http_client=http_client, proxy=proxy, reference=reference)
             if reference is None:
                 return None
 
@@ -239,12 +242,12 @@ class Tapper:
             logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Get tasks request error - {error}")
             return None
 
-    async def complete_tasks(self, tasks, http_client, reference):
+    async def complete_tasks(self, tasks, http_client, proxy, reference):
         if not tasks:
             logger.info(f"<light-yellow>{self.session_name}</light-yellow> | No tasks found or error occurred")
             return
 
-        reference = await self.get_reference(http_client, reference)
+        reference = await self.get_reference(http_client=http_client, proxy=proxy, reference=reference)
         if reference is None:
             return
 
@@ -350,7 +353,7 @@ class Tapper:
 
         while True:
             try:
-                tg_web_data = await self.get_tg_web_data(proxy=proxy)
+                tg_web_data = await self.get_tg_web_data(proxy=proxy, http_client=http_client)
                 tg_web_data_parts = tg_web_data.split('&')
 
                 user_data = tg_web_data_parts[0].split('=')[1]
@@ -378,14 +381,15 @@ class Tapper:
                                        f", now {streak_daily}")
 
                 if status and not referred:
-                    logger.info(f"<light-yellow>{self.session_name}</light-yellow> | Successfully referral, balance: "
-                                f"{balance}")
+                    logger.info(f"<light-yellow>{self.session_name}</light-yellow> | Successfully logged and referral, "
+                                f"balance: {balance}")
                     referred = True
 
                 if settings.AUTO_TASKS:
-                    tasks = await self.get_tasks(http_client=http_client, reference=reference)
+                    print(reference)
+                    tasks = await self.get_tasks(http_client=http_client, proxy=proxy, reference=reference)
                     if tasks:
-                        await self.complete_tasks(tasks, http_client=http_client, reference=reference)
+                        await self.complete_tasks(tasks, http_client=http_client, proxy=proxy, reference=reference)
 
                 logger.info(f"<light-yellow>{self.session_name}</light-yellow> | Going sleep 12h")
 

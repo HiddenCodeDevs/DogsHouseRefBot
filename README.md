@@ -11,20 +11,22 @@
 > 🇷 🇺 README in russian available [here](README-RU.md)
 
 ## Features  
-|                          Feature                          | Supported |
-|:---------------------------------------------------------:|:---------:|
-|                      Multithreading                       |     ✅     |
-|                 Proxy binding to session                  |     ✅     |
-|                       Auto Referral                       |     ✅     |
-| Support for tdata / pyrogram .session / telethon .session |     ✅     |
+|                         Feature                          | Supported |
+|:--------------------------------------------------------:|:---------:|
+|                      Multithreading                      |     ✅     |
+|                 Proxy binding to session                 |     ✅     |
+|                      Auto Referral                       |     ✅     |
+|   Auto doing tasks which is available for regular user   |     ✅     |
+|              Support for pyrogram .session               |     ✅     |
 
 
 ## [Settings](https://github.com/HiddenCodeDevs/DogsHouseRefBot/blob/main/.env-example/)
-|        Settings         |                                 Description                                  |
-|:-----------------------:|:----------------------------------------------------------------------------:|
-|  **API_ID / API_HASH**  |   Platform data from which to run the Telegram session (default - android)   |
-|       **REF_ID**        |                 Text after 'startapp=' in your referral link                 |
-| **USE_PROXY_FROM_FILE** | Whether to use a proxy from the `bot/config/proxies.txt` file (True / False) |
+|        Settings         |                                      Description                                       |
+|:-----------------------:|:--------------------------------------------------------------------------------------:|
+|  **API_ID / API_HASH**  |        Platform data from which to run the Telegram session (default - android)        |
+|     **AUTO_TASKS**      |                            Do tasks or not (default - True)                            |
+|       **REF_ID**        | Text after 'startapp=' in your referral link, if u dont paste, then bot will just exit |
+| **USE_PROXY_FROM_FILE** |      Whether to use a proxy from the `bot/config/proxies.txt` file (True / False)      |
 
 ## Quick Start 📚
 
