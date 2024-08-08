@@ -264,6 +264,7 @@ class Tapper:
             'notcoin-other-tiers': self.verify_task,
             'join-blum-tribe': self.verify_task,
             'subscribe-durov': self.verify_task,
+            'share-story': self.verify_task,
             'subscribe-dogs': self.subscribe_channel_and_verify,
             'subscribe-blum': self.subscribe_channel_and_verify,
             'subscribe-notcoin': self.subscribe_channel_and_verify,
