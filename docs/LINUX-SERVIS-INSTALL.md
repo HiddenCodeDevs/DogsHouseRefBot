@@ -8,9 +8,9 @@ _Настройка бота как службы позволяет запуск
 2. Откройте терминал и перейдите в эту папку:
     `cd root/example_folder`
 3. Клонируйте репозиторий с помощью [git](https://www.git-scm.com/):
-    `git clone https://github.com/shamhi/CoinEggBot.git`
+    `git clone https://github.com/HiddenCodeDevs/DogsHouseRefBot.git`
 4. Перейдите в клонированный репозиторий:
-    `cd root/example_folder/CoinEggBot`
+    `cd root/example_folder/DogsHouseRefBot`
 
 #### II. Настройка проекта
 1. Создайте виртуальное окружение:
@@ -29,20 +29,20 @@ _Настройка бота как службы позволяет запуск
 1. Перейдите в системную папку, где хранятся все службы, используя терминал:
     `cd /etc/systemd/system/`
 2. Создайте файл службы с любым именем:
-    `sudo touch hamsterbot.service`
+    `sudo touch DogsHouseRefBot.service`
 3. Заполните файл `.service` содержимым, используя любой текстовый редактор:
-    `sudo nano hamsterbot.service` _(nano в качестве примера)_
+    `sudo nano DogsHouseRefBot.service` _(nano в качестве примера)_
     **Содержимое:**
     > ```makefile
     > [Unit]
-    > Description=CoinEggBotService
+    > Description=DogsHouseRefBotService
     > After=network.target
     > 
     > [Service]
     > User=root
-    > WorkingDirectory=/root/example/CoinEggBot/
-    > Environment=PATH=/root/example/CoinEggBot/venv/bin/
-    > ExecStart=/root/example/CoinEggBot/venv/bin/python3 /root/example/CoinEggBot/main.py -a 2
+    > WorkingDirectory=/root/example/DogsHouseRefBot/
+    > Environment=PATH=/root/example/DogsHouseRefBot/venv/bin/
+    > ExecStart=/root/example/DogsHouseRefBot/venv/bin/python3 /root/example/DogsHouseRefBot/main.py -a 2
     > 
     > Restart=always
     > 
@@ -58,26 +58,26 @@ _Настройка бота как службы позволяет запуск
 1. Перезагрузите конфигурацию менеджера служб, используя терминал:
     `sudo systemctl daemon-reload`
 1. Включите службу, настроив ее на автоматический запуск:
-    `sudo systemctl enable hamsterbot.service`
+    `sudo systemctl enable DogsHouseRefBot.service`
 ___
 **Теперь мы закончили.**
 
 ___
 # Управление службой:
 **Остановить службу:**
-`sudo systemctl stop hamsterbot.service`
+`sudo systemctl stop DogsHouseRefBot.service`
 
 **Запустить службу:**
-`sudo systemctl start hamsterbot.service`
+`sudo systemctl start DogsHouseRefBot.service`
 
 **Перезапустить службу:**
-`sudo systemctl restart hamsterbot.service`
+`sudo systemctl restart DogsHouseRefBot.service`
 
 **Проверить статус:**
-`sudo systemctl status hamsterbot.service`
+`sudo systemctl status DogsHouseRefBot.service`
 
 **Проверить логи:**
-`sudo journalctl -u hamsterbot.service`
+`sudo journalctl -u DogsHouseRefBot.service`
 
 **Проверить логи в реальном времени:**
-`sudo journalctl -u hamsterbot.service -f`
+`sudo journalctl -u DogsHouseRefBot.service -f`

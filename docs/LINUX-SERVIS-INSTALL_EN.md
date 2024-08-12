@@ -8,9 +8,9 @@ _Setting bot as service allows you to run it in backrgound and easily control._
 2. Open terminal and navigate to this folder:
     `cd root/example_folder`
 3. Clone bot using [git](https://www.git-scm.com/):
-    `git clone https://github.com/shamhi/CoinEggBot.git`
+    `git clone https://github.com/HiddenCodeDevs/DogsHouseRefBot.git`
 4. Navigate to clonned repository:
-    `cd root/example_folder/CoinEggBot`
+    `cd root/example_folder/DogsHouseRefBot`
 
 #### II. Setup project
 1. Create a virtual enviroment:
@@ -29,20 +29,20 @@ _Setting bot as service allows you to run it in backrgound and easily control._
 1. Navigate to system folder where every service is stored using terminal:
     `cd /etc/systemd/system/`
 2. Create service file with any name you want:
-    `sudo touch hamsterbot.service`
+    `sudo touch DogsHouseRefBot.service`
 3. Fill `.service` file with content using any code editor:
-    `sudo nano hamsterbot.service` _(nano for example)_
+    `sudo nano DogsHouseRefBot.service` _(nano for example)_
     **Content:**
     > ```makefile
     > [Unit]
-    > Description=CoinEggBotService
+    > Description=DogsHouseRefBot
     > After=network.target
     > 
     > [Service]
     > User=root
-    > WorkingDirectory=/root/example/CoinEggBot/
-    > Environment=PATH=/root/example/CoinEggBot/venv/bin/
-    > ExecStart=/root/example/CoinEggBot/venv/bin/python3 /root/example/> CoinEggBot/main.py -a 2
+    > WorkingDirectory=/root/example/DogsHouseRefBot/
+    > Environment=PATH=/root/example/DogsHouseRefBot/venv/bin/
+    > ExecStart=/root/example/DogsHouseRefBot/venv/bin/python3 /root/example/> DogsHouseRefBot/main.py -a 2
     > 
     > Restart=always
     > 
@@ -58,26 +58,26 @@ _Setting bot as service allows you to run it in backrgound and easily control._
 1. Reload system manager config using terminal:
     `sudo systemctl daemon-reload`
 1. Enable service, setting it as autostarted:
-    `sudo systemctl enable hamsterbot.service`
+    `sudo systemctl enable DogsHouseRefBot.service`
 ___
 **Now we are done.**
 
 ___
 # Service manipulations:
 **Stop service:**
-`sudo systemctl stop hamsterbot.service`
+`sudo systemctl stop DogsHouseRefBot.service`
 
 **Start service:**
-`sudo systemctl start hamsterbot.service`
+`sudo systemctl start DogsHouseRefBot.service`
 
 **Restart service:**
-`sudo systemctl restart hamsterbot.service`
+`sudo systemctl restart DogsHouseRefBot.service`
 
 **Check status:**
-`sudo systemctl status hamsterbot.service`
+`sudo systemctl status DogsHouseRefBot.service`
 
 **Check logs:**
-`sudo journalctl -u hamsterbot.service`
+`sudo journalctl -u DogsHouseRefBot.service`
 
 **Check logs in real time:**
-`sudo journalctl -u hamsterbot.service -f`
+`sudo journalctl -u DogsHouseRefBot.service -f`

@@ -1,7 +1,7 @@
 version: '3'
 services:
   bot:
-    container_name: 'CoinEggBot'
+    container_name: 'DogsHouseRefBot'
     build:
       context: .
     stop_signal: SIGINT
