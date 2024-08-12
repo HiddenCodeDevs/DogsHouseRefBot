@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# Auth keys
+auth_keys.json
+
 # Distribution / packaging
 .Python
 build/
@@ -161,9 +164,3 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
-
-*.session
-
-user_agents.json
-
-*.json

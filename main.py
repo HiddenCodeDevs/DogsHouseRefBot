@@ -9,5 +9,5 @@ async def main():
 
 
 if __name__ == '__main__':
-    with suppress(KeyboardInterrupt):
+    with suppress(KeyboardInterrupt, SystemExit, RuntimeWarning, RuntimeError):
         asyncio.run(main())

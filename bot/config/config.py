@@ -6,14 +6,10 @@ class Settings(BaseSettings):
 
     API_ID: int
     API_HASH: str
-   
-    AUTO_TASKS: bool = True
 
-    REF_ID: str = ''
+    REFERRAL_TOKEN: str = ""
 
-    USE_PROXY_FROM_FILE: bool = False
+    USE_RANDOM_USERAGENT: bool = False
 
 
 settings = Settings()
-
-

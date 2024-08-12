@@ -1,0 +1,14 @@
+[Unit]
+Description=DogsBotService
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/root/example/DogsBot/
+Environment=PATH=/root/example/DogsBot/venv/bin/
+ExecStart=/root/example/DogsBot/venv/bin/python3 /root/DogsBot/> CoinEggBot/main.py -a 1
+
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

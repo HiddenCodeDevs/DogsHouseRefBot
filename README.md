@@ -1,110 +1,81 @@
-[![Static Badge](https://img.shields.io/badge/Telegram-Channel-Link?style=for-the-badge&logo=Telegram&logoColor=white&logoSize=auto&color=blue)](https://t.me/hidden_coding)
+[<img src="https://img.shields.io/badge/Telegram-%40Me-orange">](https://t.me/sho6ot)
+[<img src="https://img.shields.io/badge/python-3.10%20%7C%203.11-blue">](https://www.python.org/downloads/)
 
-[![Static Badge](https://img.shields.io/badge/Telegram-Chat-yes?style=for-the-badge&logo=Telegram&logoColor=white&logoSize=auto&color=blue)](https://t.me/hidden_codding_chat)
+![img1](.github/images/demo.png)
 
-[![Static Badge](https://img.shields.io/badge/Telegram-Bot%20Link-Link?style=for-the-badge&logo=Telegram&logoColor=white&logoSize=auto&color=blue)](https://t.me/dogshouse_bot/join?startapp=iU0RHUJ7SAyFo4FyDthQ7w)
+> 🇪🇳 README in english available [here](README-EN.md)
 
-## Recommendation before use
+## ⚙ [Настройки](https://github.com/shamhi/CoinEggBot/blob/main/.env-example)
+| Настройка                | Описание                                                                                   |
+|--------------------------|--------------------------------------------------------------------------------------------|
+| **API_ID / API_HASH**    | Данные платформы, с которой запускать сессию Telegram _(сток - Android)_                   |
+| **REFERRAL_TOKEN**       | Реферальный токен, по которому будут активированы все сессии _(напр. kBNoWEHfEAB1Snb12aP)_ |
+| **CLAIM_INVITE_REWARD**  | Собирать ли награды с приглашенных друзей _(True / False)_                                 |
+| **BUY_SCENES**           | Покупать ли новые локации _(True / False)_                                                 |
+| **SLEEP_BETWEEN_CLAIM**  | Рандомная задержка между клеймами в секундах _(напр. [2,4])_                               |
+| **SLEEP_INTERVAL**       | Интервал задержки в цикле _(напр. 60)_                                                     |
+| **USE_RANDOM_USERAGENT** | Использовать ли рандомный User Agent при каждом новом запуске _(True / False)_             |
 
-# 🔥🔥 PYTHON version must be 3.10 🔥🔥
-
-> 🇷 🇺 README in russian available [here](README-RU.md)
-
-## Features  
-|                         Feature                          | Supported |
-|:--------------------------------------------------------:|:---------:|
-|                      Multithreading                      |     ✅     |
-|                 Proxy binding to session                 |     ✅     |
-|                      Auto Referral                       |     ✅     |
-|   Auto doing tasks which is available for regular user   |     ✅     |
-|              Support for pyrogram .session               |     ✅     |
-
-
-## [Settings](https://github.com/HiddenCodeDevs/DogsHouseRefBot/blob/main/.env-example/)
-|        Settings         |                                      Description                                       |
-|:-----------------------:|:--------------------------------------------------------------------------------------:|
-|  **API_ID / API_HASH**  |        Platform data from which to run the Telegram session (default - android)        |
-|     **AUTO_TASKS**      |                            Do tasks or not (default - True)                            |
-|       **REF_ID**        | Text after 'startapp=' in your referral link, if u dont paste, then bot will just exit |
-| **USE_PROXY_FROM_FILE** |      Whether to use a proxy from the `bot/config/proxies.txt` file (True / False)      |
-
-## Quick Start 📚
-
-To fast install libraries and run bot - open run.bat on Windows or run.sh on Linux
-
-## Prerequisites
-Before you begin, make sure you have the following installed:
-- [Python](https://www.python.org/downloads/) **version 3.10**
-
-## Obtaining API Keys
-1. Go to my.telegram.org and log in using your phone number.
-2. Select "API development tools" and fill out the form to register a new application.
-3. Record the API_ID and API_HASH provided after registering your application in the .env file.
-
-## Installation
-You can download the [**repository**](https://github.com/HiddenCodeDevs/DogsHouseRefBot) by cloning it to your system and installing the necessary dependencies:
-```shell
-git clone https://github.com/HiddenCodeDevs/DogsHouseRefBot.git
-cd DogsHouseRefBot
+## 📕 Профили
+Для каждой сессии можно создать профиль с уникальными данными:
+```json
+{
+  "session1": {
+    "proxy": "socks5://yGow3a:uBro3wL@58.195.21.83:9715",
+    "headers": {"...": "..."}
+  },
+  "session2": {
+    "proxy": "socks5://yGow3a:uBro3wL@58.195.21.83:9715",
+    "headers": {"...": "..."}
+  },
+  "...": {}
+}
 ```
+> ❕ **Примечание**:  `session1` и `session2` - это примеры названий сессий.
 
-Then you can do automatic installation by typing:
+## ⚡ Быстрый старт
+1. Чтобы установить библиотеки в Windows, запустите INSTALL.bat.
+2. Для запуска бота используйте `START.bat` (или в консоли: `python main.py`).
 
-Windows:
+## 📌 Предварительные условия
+Прежде чем начать, убедитесь, что у вас установлено следующее:
+- [Python](https://www.python.org/downloads/) версии 3.10 или 3.11.
+
+## 📃 Получение API ключей
+1. Перейдите на сайт [my.telegram.org](https://my.telegram.org) и войдите в систему, используя свой номер телефона.
+2. Выберите **"API development tools"** и заполните форму для регистрации нового приложения.
+3. Запишите `API_ID` и `API_HASH` в файле `.env`, предоставленные после регистрации вашего приложения.
+
+## 🧱 Установка
+Вы можете скачать [**Репозиторий**](https://github.com/shamhi/CoinEggBot) клонированием на вашу систему и установкой необходимых зависимостей:
 ```shell
-run.bat
-```
+~ >>> git clone https://github.com/shamhi/CoinEggBot.git 
+~ >>> cd CoinEggBot
 
-Linux:
+# Linux
+~/CoinEggBot >>> python3 -m venv venv
+~/CoinEggBot >>> source venv/bin/activate
+~/CoinEggBot >>> pip3 install -r requirements.txt
+~/CoinEggBot >>> cp .env-example .env
+~/CoinEggBot >>> nano .env  # Здесь вы обязательно должны указать ваши API_ID и API_HASH , остальное берется по умолчанию
+~/CoinEggBot >>> python3 main.py
+
+# Windows
+~/CoinEggBot >>> python -m venv venv
+~/CoinEggBot >>> venv\Scripts\activate
+~/CoinEggBot >>> pip install -r requirements.txt
+~/CoinEggBot >>> copy .env-example .env
+~/CoinEggBot >>> # Указываете ваши API_ID и API_HASH, остальное берется по умолчанию
+~/CoinEggBot >>> python main.py
+```
+> Установка в качестве Linux службы для фоновой работы бота [тут](docs/LINUX-SERVIS-INSTALL.md).
+
+⏳ Также для быстрого запуска вы можете использовать аргументы, например:
 ```shell
-run.sh
+~/CoinEggBot >>> python3 main.py --action (1/2)
+# Или
+~/CoinEggBot >>> python3 main.py -a (1/2)
+
+# 1 - Создает сессию
+# 2 - Запускает кликер
 ```
-
-# Linux manual installation
-```shell
-sudo sh install.sh
-python3 -m venv venv
-source venv/bin/activate
-pip3 install -r requirements.txt
-cp .env-example .env
-nano .env  # Here you must specify your API_ID and API_HASH, the rest is taken by default
-python3 main.py
-```
-
-You can also use arguments for quick start, for example:
-```shell
-~/DogsHouseRefBot >>> python3 main.py --action (1/2)
-# Or
-~/DogsHouseRefBot >>> python3 main.py -a (1/2)
-
-# 1 - Run clicker
-# 2 - Creates a session
-```
-
-# Windows manual installation
-```shell
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-copy .env-example .env
-# Here you must specify your API_ID and API_HASH, the rest is taken by default
-python main.py
-```
-
-You can also use arguments for quick start, for example:
-```shell
-~/DogsHouseRefBot >>> python main.py --action (1/2)
-# Or
-~/DogsHouseRefBot >>> python main.py -a (1/2)
-
-# 1 - Run clicker
-# 2 - Creates a session
-```
-
-
-
-
-### Contacts
-
-For support or questions, contact me on Telegram: 
-[![Static Badge](https://img.shields.io/badge/telegram-bot_author-link?style=for-the-badge&logo=telegram&logoColor=white&logoSize=auto&color=blue)](https://t.me/unknxwnplxya)
