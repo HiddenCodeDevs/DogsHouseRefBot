@@ -30,6 +30,16 @@ def save_referral_link(name: str, referral_link: str, invite_count: int):
 
     db.save_data(referrals)
 
+def save_balance(name: str, balance_value: int):
+    db = JsonDB("accounts_balance")
+
+    accounts_balance = db.get_data()
+    accounts_balance[name] = {
+        'balance': balance_value
+    }
+
+    db.save_data(accounts_balance)
+
 
 def get_headers(name: str):
     db = JsonDB("profiles")

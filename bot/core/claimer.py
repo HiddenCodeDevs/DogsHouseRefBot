@@ -6,7 +6,7 @@ from pyrogram import Client
 
 from bot.config import settings
 from bot.utils.logger import logger
-from bot.utils.scripts import save_referral_link
+from bot.utils.scripts import save_referral_link, save_balance
 from bot.exceptions import InvalidSession
 from bot.api.auth import login
 from bot.utils.scripts import get_headers
@@ -57,7 +57,10 @@ class Claimer:
                     if not login_json:
                         continue
 
+
+                    print(login_json)
                     self.reference = login_json['reference']
+                    balance = login_json['balance']
 
                     tasks = await get_tasks(
                         http_client=http_client,
@@ -83,6 +86,9 @@ class Claimer:
                         logger.success(f'{self.session_name} | 5 friends quest not completed, saving ref')
                     else:
                         logger.info(f'{self.session_name} | 5 friends quest completed, skip saving')
+
+                    save_balance(name=self.session_name, balance_value=balance)
+                    logger.info(f'{self.session_name} | Saved balance')
 
                     await asyncio.sleep(99999)
 
