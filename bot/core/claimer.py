@@ -11,7 +11,7 @@ from bot.exceptions import InvalidSession
 from bot.api.auth import login
 from bot.utils.scripts import get_headers
 from bot.utils.init_data import get_init_data
-from bot.api.clicker import get_friends_count, get_tasks, complete_tasks
+from bot.api.clicker import get_friends_count, get_tasks, complete_tasks, check_friends_task
 from bot.utils.proxy import check_proxy
 
 
@@ -73,13 +73,16 @@ class Claimer:
 
                     count = await get_friends_count(http_client=http_client, user_id=user_id,
                                                     reference=login_json["reference"])
-                    if count == 0:
+                    check_task = await check_friends_task(http_client, user_id=user_id,
+                                                          reference=login_json["reference"],
+                                                          session_name=self.session_name)
+                    if check_task is False:
                         save_referral_link(name=self.session_name, referral_link=invite_link,
                                            invite_count=count)
 
-                        logger.success(f'{self.session_name} | saved ref')
+                        logger.success(f'{self.session_name} | 5 friends quest not completed, saving ref')
                     else:
-                        logger.info(f'{self.session_name} | More then zero friends invited, skip saving')
+                        logger.info(f'{self.session_name} | 5 friends quest completed, skip saving')
 
                     await asyncio.sleep(99999)
 

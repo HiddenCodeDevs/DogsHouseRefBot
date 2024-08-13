@@ -50,6 +50,9 @@ async def complete_tasks(tasks, http_client, reference, user_id, session_name, t
         'subscribe-notcoin': subscribe_channel_and_verify,
         'invite-frens': check_and_verify_invite_friends,
         'add-bone-telegram': add_bone_telegram_and_verify,
+        'follow-durov-x': verify_task,
+        'follow-notcoin-x': verify_task,
+        'follow-blum-x': verify_task,
     }
 
     tasks_not_completed = []
@@ -133,3 +136,22 @@ async def add_bone_telegram_and_verify(slug, http_client, reference, reward, use
     finally:
         if tg_client.is_connected:
             await tg_client.disconnect()
+
+async def check_friends_task(http_client, user_id, reference, session_name):
+    try:
+        response_json = await make_request(
+            http_client,
+            'GET',
+            f'https://api.onetime.dog/tasks?user_id={user_id}&reference={reference}',
+            'getting Tasks',
+            'getting Tasks'
+        )
+        for task in response_json:
+            if task['slug'] == 'invite-frens' and task['complete'] is True:
+                return True
+            elif task['slug'] == 'invite-frens' and task['complete'] is False:
+                return False
+    except Exception as e:
+        logger.error(
+            f"<light_yellow>{session_name}</light-yellow> | Error checking friends task"
+        )
