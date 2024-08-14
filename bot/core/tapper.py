@@ -270,6 +270,9 @@ class Tapper:
             'subscribe-notcoin': self.subscribe_channel_and_verify,
             'invite-frens': self.check_and_verify_invite_friends,
             'add-bone-telegram': self.add_bone_telegram_and_verify,
+            'follow-durov-x': self.verify_task,
+            'follow-notcoin-x': self.verify_task,
+            'follow-blum-x': self.verify_task,
         }
 
         tasks_not_completed = []
