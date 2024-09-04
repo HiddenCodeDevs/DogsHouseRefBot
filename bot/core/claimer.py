@@ -61,33 +61,10 @@ class Claimer:
                     print(login_json)
                     self.reference = login_json['reference']
                     balance = login_json['balance']
+                    withdraw_status = login_json['withdraw_to']
+                    wallet = login_json['wallet']
 
-                    tasks = await get_tasks(
-                        http_client=http_client,
-                        user_id=self.user_id,
-                        reference=self.reference
-                    )
-
-                    if tasks:
-                        await complete_tasks(tasks, http_client, reference=self.reference, user_id=self.user_id,
-                                             session_name=self.session_name, tg_client=self.tg_client)
-
-                    invite_link = f'https://t.me/dogshouse_bot/join?startapp={login_json["reference"]}'
-
-                    count = await get_friends_count(http_client=http_client, user_id=user_id,
-                                                    reference=login_json["reference"])
-                    check_task = await check_friends_task(http_client, user_id=user_id,
-                                                          reference=login_json["reference"],
-                                                          session_name=self.session_name)
-                    if check_task is False:
-                        save_referral_link(name=self.session_name, referral_link=invite_link,
-                                           invite_count=count)
-
-                        logger.success(f'{self.session_name} | 5 friends quest not completed, saving ref')
-                    else:
-                        logger.info(f'{self.session_name} | 5 friends quest completed, skip saving')
-
-                    save_balance(name=self.session_name, balance_value=balance)
+                    save_balance(name=self.session_name, balance_value=balance, withdraw=withdraw_status, wallet=wallet)
                     logger.info(f'{self.session_name} | Saved balance')
 
                     await asyncio.sleep(99999)
